@@ -14,7 +14,7 @@
 | Custom case                 | ❔ | ✅ | ✅ | ❌
 | Custom transformation       | ❌ | ✅ | ❌ | ❌
 | Suppress initial components | ❌ | ❌ | ✅ | ✅ 
-| Support data refs (render)  | ❌ | ❌ | ✅ | ⚠️
+| Support data refs (render)  | ✅ | ❌ | ✅ | ⚠️
 | Support polymorphic tables  | ❌ | ❌ | ✅ | ⚠️ 
 
 ## Camel case
@@ -81,14 +81,20 @@ So for this example:
 ```
  types:
             BEGIN OF root_ts,
-              sample TYPE REF TO data,
+              name TYPE REF TO data,
             END OF root_ts.
-        data(ref_to_sample) = VALUE root_ts( sample = ref #( sample ) ).
+        data(ref_to_sample) = VALUE root_ts( name = ref #( sample-name ) ).
 ```
 
 UI2 and Abapify libs seem to handle refs correctly, but XCO just dumps.. 
 ```
-
+Ref to data
+/ui2/cl_json
+{"name":"Benchmark Data"}  
+zcl_json
+{"name":"Benchmark Data"}  
+identity
+{"DATA":{"NAME":{"%type":"xsd:string","%val":"Benchmark Data"}}}  
 ```
 
 to be continued....
