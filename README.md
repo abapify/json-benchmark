@@ -15,7 +15,8 @@
 | Custom transformation       | ❌ | ✅ | ❌ | ❌
 | Suppress initial components | ❌ | ❌ | ✅ | ✅ 
 | Support data refs (render)  | ✅ | ❌ | ✅ | ⚠️
-| Support polymorphic tables  | ❌ | ❌ | ✅ | ⚠️ 
+| Support polymorphic tables  | ✅ | ❌ | ✅ | ⚠️ 
+| Root array                  | ✅ | ✅ | ✅ | ❌ 
 
 ## Camel case
 Camel case is usually the most common case in JSON world. Removing separators like - or _ helps to reduce the size of payload and devs use a special camelCase notation.
@@ -96,6 +97,8 @@ zcl_json
 identity
 {"DATA":{"NAME":{"%type":"xsd:string","%val":"Benchmark Data"}}}  
 ```
+
+Both libs also support `table of ref to data` which is also nice.
 
 ## Performance evaluation
 
