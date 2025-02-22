@@ -1,0 +1,124 @@
+*"* use this source file for the definition and implementation of
+*"* local helper classes, interface definitions and type
+*"* declarations
+INTERFACE lif_json.
+  METHODS:
+    parse IMPORTING json TYPE xstring to TYPE REF TO data RAISING cx_static_check,
+    render IMPORTING data TYPE any RETURNING VALUE(json) TYPE xstring RAISING cx_static_check,
+    stringify IMPORTING data TYPE any RETURNING VALUE(result) TYPE string RAISING cx_static_check.
+
+ENDINTERFACE.
+
+class lcl_json DEFINITION ABSTRACT.
+PUBLIC SECTION.
+INTERFACES lif_json ALL METHODS ABSTRACT.
+ ALIASES render for lif_json~render.
+ ALIASES parse for lif_json~parse.
+ ALIASES stringify for lif_json~stringify.
+ENDCLASS.
+
+CLASS lcl_benchmark DEFINITION INHERITING FROM lcl_json FINAL.
+  PUBLIC SECTION.
+    METHODS:
+      constructor IMPORTING json_handler TYPE REF TO lif_json.
+    METHODS render REDEFINITION.
+    METHODS parse REDEFINITION.
+    METHODS stringify REDEFINITION.
+  PRIVATE SECTION.
+    DATA: json_handler TYPE REF TO lif_json,
+          iterations TYPE i VALUE 100.
+ENDCLASS.
+
+CLASS lcl_benchmark IMPLEMENTATION.
+  METHOD constructor.
+    super->constructor( ).
+    me->json_handler = json_handler.
+  ENDMETHOD.
+
+  METHOD parse.
+    DO iterations TIMES.
+      me->json_handler->parse( EXPORTING json = json to = to ).
+    ENDDO.
+  ENDMETHOD.
+
+  METHOD render.
+    DATA result TYPE xstring.
+    DO iterations TIMES.
+      me->json_handler->render( EXPORTING data = data ).
+    ENDDO.
+  ENDMETHOD.
+  METHOD stringify.
+    DO iterations TIMES.
+      me->json_handler->stringify( EXPORTING data = data ).
+    ENDDO.
+  ENDMETHOD.
+
+ENDCLASS.
+
+CLASS lcl_ui2_json DEFINITION FINAL.
+  PUBLIC SECTION.
+    INTERFACES lif_json.
+ENDCLASS.
+
+CLASS lcl_ui2_json IMPLEMENTATION.
+  METHOD lif_json~parse.
+    ASSIGN to->* to FIELD-SYMBOL(<to>).
+    /ui2/cl_json=>deserialize( EXPORTING jsonx = json CHANGING data = <to> ).
+  ENDMETHOD.
+
+  METHOD lif_json~render.
+    data(string) = me->lif_json~stringify( data  ).
+    json = cl_abap_conv_codepage=>create_out( )->convert( string ).
+  ENDMETHOD.
+  METHOD lif_json~stringify.
+     result = /ui2/cl_json=>serialize( EXPORTING data = data ).
+  ENDMETHOD.
+
+ENDCLASS.
+
+CLASS lcl_xco_json DEFINITION FINAL.
+  PUBLIC SECTION.
+    INTERFACES lif_json.
+ENDCLASS.
+
+CLASS lcl_xco_json IMPLEMENTATION.
+  METHOD lif_json~parse.
+
+    data(lv_json_string) = cl_abap_conv_codepage=>create_in( )->convert( json ).
+    data(lo_data) = xco_cp_json=>data->from_string( lv_json_string ).
+    lo_data->write_to( ia_data = to ).
+
+  ENDMETHOD.
+
+  METHOD lif_json~render.
+    data(string) = me->lif_json~stringify( data ).
+    json = cl_abap_conv_codepage=>create_out( )->convert( string ).
+  ENDMETHOD.
+  METHOD lif_json~stringify.
+    result = xco_cp_json=>data->from_abap( data )->to_string( ).
+  ENDMETHOD.
+
+ENDCLASS.
+
+CLASS lcl_abapify_json DEFINITION FINAL.
+  PUBLIC SECTION.
+    INTERFACES lif_json.
+ENDCLASS.
+
+CLASS lcl_abapify_json IMPLEMENTATION.
+  METHOD lif_json~parse.
+    TRY.
+        zcl_json=>parse( json )->to( to ).
+      CATCH cx_static_check.
+        "handle exception
+    ENDTRY.
+  ENDMETHOD.
+
+  METHOD lif_json~render.
+    json = zcl_json=>render( data ).
+  ENDMETHOD.
+  METHOD lif_json~stringify.
+    result = zcl_json=>stringify( data ).
+  ENDMETHOD.
+
+ENDCLASS.
