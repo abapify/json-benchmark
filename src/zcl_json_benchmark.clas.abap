@@ -33,7 +33,7 @@ CLASS zcl_json_benchmark DEFINITION FINAL PUBLIC.
              name         TYPE string,
              nested       TYPE ty_nested,
              nested_table TYPE ty_nested_tab,
-             "ref_table TYPE TABLE OF REF TO data WITH EMPTY KEY,
+*             ref_table TYPE TABLE OF REF TO data WITH EMPTY KEY,
            END OF ty_main.
 
     CLASS-DATA sample TYPE ty_main.
@@ -72,7 +72,7 @@ CLASS zcl_json_benchmark IMPLEMENTATION.
             xsd_currcode_field = 'EUR'
             xsd_unitcode_field = 'KM' )
           nested_table = VALUE #( FOR i = 1 THEN i + 1 UNTIL i > 10 ( VALUE #( int_field = i char_field = |Entry { i }| ) ) )
-          "ref_table = VALUE #( FOR i = 1 THEN i + 1 UNTIL i > 5 ( NEW ty_nested( int_field = i char_field = |Ref { i }| )  ) )
+*          ref_table = VALUE #( FOR i = 1 THEN i + 1 UNTIL i > 5 ( NEW ty_nested( int_field = i char_field = |Ref { i }| )  ) )
           ).
       CATCH cx_uuid_error.
         "handle exception
@@ -85,6 +85,39 @@ CLASS zcl_json_benchmark IMPLEMENTATION.
         out->write( name = '/ui2/cl_json' data = NEW lcl_ui2_json( )->lif_json~stringify( sample ) ).
         out->write( name = 'xco_cp_json' data = NEW lcl_xco_json( )->lif_json~stringify( sample ) ).
         out->write( name = 'zcl_json' data = NEW lcl_abapify_json( )->lif_json~stringify( sample ) ).
+
+        out->write( ` ` ).
+        out->write( 'Single value' ).
+        out->write( name = '/ui2/cl_json' data = NEW lcl_ui2_json( )->lif_json~stringify( sample-id ) ).
+        out->write( name = 'xco_cp_json' data = NEW lcl_xco_json( )->lif_json~stringify( sample-id ) ).
+        out->write( name = 'zcl_json' data = NEW lcl_abapify_json( )->lif_json~stringify( sample-id ) ).
+
+        types:
+            BEGIN OF root_ts,
+              name TYPE REF TO data,
+            END OF root_ts.
+        data(ref_to_sample) = VALUE root_ts( name = ref #( sample-name ) ).
+        out->write( ` ` ).
+        out->write( 'Ref to data' ).
+        out->write( name = '/ui2/cl_json' data = NEW lcl_ui2_json( )->lif_json~stringify( ref_to_sample ) ).
+        " XCO dumps
+        out->write( name = 'zcl_json' data = NEW lcl_abapify_json( )->lif_json~stringify( ref_to_sample ) ).
+        out->write( name = 'identity' data = NEW lcl_identity_json( )->lif_json~stringify( ref_to_sample ) ).
+
+        types:
+            BEGIN OF root_root_ts,
+              root TYPE REF TO root_ts,
+            END OF root_root_ts.
+        data(ref_to_root) = VALUE root_root_ts( root = ref #( ref_to_sample ) ).
+        out->write( ` ` ).
+        out->write( 'Ref to structure' ).
+        out->write( name = '/ui2/cl_json' data = NEW lcl_ui2_json( )->lif_json~stringify( ref_to_root ) ).
+        " XCO dumps
+        out->write( name = 'zcl_json' data = NEW lcl_abapify_json( )->lif_json~stringify( ref_to_root ) ).
+        out->write( name = 'identity' data = NEW lcl_identity_json( )->lif_json~stringify( ref_to_root ) ).
+
+
+
       CATCH cx_static_check INTO DATA(lo_cx).
         out->write(
           EXPORTING
