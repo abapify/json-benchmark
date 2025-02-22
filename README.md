@@ -97,6 +97,18 @@ identity
 {"DATA":{"NAME":{"%type":"xsd:string","%val":"Benchmark Data"}}}  
 ```
 
+## Performance evaluation
+
+### Rendering (binary format)
+
+Setup:
+- Same data object
+- 100 iterations
+
+![image](https://github.com/user-attachments/assets/43c986f2-bf94-4cca-8ae5-d9724fca1268)
+
+As you can see identity is almost free, XCO is disappointingly slow. UI2 seems working twice faster than Abapify currently.
+
 to be continued....
 
   
