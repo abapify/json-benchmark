@@ -71,7 +71,7 @@ CLASS lcl_ui2_json IMPLEMENTATION.
     json = cl_abap_conv_codepage=>create_out( )->convert( string ).
   ENDMETHOD.
   METHOD lif_json~stringify.
-    result = /ui2/cl_json=>serialize( EXPORTING data = data ).
+    result = /ui2/cl_json=>serialize( EXPORTING data = data pretty_name = abap_true ).
   ENDMETHOD.
 
 ENDCLASS.
@@ -95,7 +95,9 @@ CLASS lcl_xco_json IMPLEMENTATION.
     json = cl_abap_conv_codepage=>create_out( )->convert( string ).
   ENDMETHOD.
   METHOD lif_json~stringify.
-    result = xco_cp_json=>data->from_abap( data )->to_string( ).
+    result = xco_cp_json=>data->from_abap( data )->apply( it_transformations = VALUE #(
+        ( xco_cp_json=>transformation->underscore_to_camel_case )
+    )  )->to_string( ).
   ENDMETHOD.
 
 ENDCLASS.
