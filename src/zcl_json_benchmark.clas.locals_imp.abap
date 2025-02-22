@@ -9,12 +9,12 @@ INTERFACE lif_json.
 
 ENDINTERFACE.
 
-class lcl_json DEFINITION ABSTRACT.
-PUBLIC SECTION.
-INTERFACES lif_json ALL METHODS ABSTRACT.
- ALIASES render for lif_json~render.
- ALIASES parse for lif_json~parse.
- ALIASES stringify for lif_json~stringify.
+CLASS lcl_json DEFINITION ABSTRACT.
+  PUBLIC SECTION.
+    INTERFACES lif_json ALL METHODS ABSTRACT.
+    ALIASES render FOR lif_json~render.
+    ALIASES parse FOR lif_json~parse.
+    ALIASES stringify FOR lif_json~stringify.
 ENDCLASS.
 
 CLASS lcl_benchmark DEFINITION INHERITING FROM lcl_json FINAL.
@@ -26,7 +26,7 @@ CLASS lcl_benchmark DEFINITION INHERITING FROM lcl_json FINAL.
     METHODS stringify REDEFINITION.
   PRIVATE SECTION.
     DATA: json_handler TYPE REF TO lif_json,
-          iterations TYPE i VALUE 100.
+          iterations   TYPE i VALUE 100.
 ENDCLASS.
 
 CLASS lcl_benchmark IMPLEMENTATION.
@@ -62,16 +62,16 @@ ENDCLASS.
 
 CLASS lcl_ui2_json IMPLEMENTATION.
   METHOD lif_json~parse.
-    ASSIGN to->* to FIELD-SYMBOL(<to>).
+    ASSIGN to->* TO FIELD-SYMBOL(<to>).
     /ui2/cl_json=>deserialize( EXPORTING jsonx = json CHANGING data = <to> ).
   ENDMETHOD.
 
   METHOD lif_json~render.
-    data(string) = me->lif_json~stringify( data  ).
+    DATA(string) = me->lif_json~stringify( data  ).
     json = cl_abap_conv_codepage=>create_out( )->convert( string ).
   ENDMETHOD.
   METHOD lif_json~stringify.
-     result = /ui2/cl_json=>serialize( EXPORTING data = data ).
+    result = /ui2/cl_json=>serialize( EXPORTING data = data ).
   ENDMETHOD.
 
 ENDCLASS.
@@ -84,14 +84,14 @@ ENDCLASS.
 CLASS lcl_xco_json IMPLEMENTATION.
   METHOD lif_json~parse.
 
-    data(lv_json_string) = cl_abap_conv_codepage=>create_in( )->convert( json ).
-    data(lo_data) = xco_cp_json=>data->from_string( lv_json_string ).
+    DATA(lv_json_string) = cl_abap_conv_codepage=>create_in( )->convert( json ).
+    DATA(lo_data) = xco_cp_json=>data->from_string( lv_json_string ).
     lo_data->write_to( ia_data = to ).
 
   ENDMETHOD.
 
   METHOD lif_json~render.
-    data(string) = me->lif_json~stringify( data ).
+    DATA(string) = me->lif_json~stringify( data ).
     json = cl_abap_conv_codepage=>create_out( )->convert( string ).
   ENDMETHOD.
   METHOD lif_json~stringify.
@@ -119,6 +119,48 @@ CLASS lcl_abapify_json IMPLEMENTATION.
   ENDMETHOD.
   METHOD lif_json~stringify.
     result = zcl_json=>stringify( data ).
+  ENDMETHOD.
+
+ENDCLASS.
+
+CLASS lcl_identity_json DEFINITION FINAL.
+  PUBLIC SECTION.
+    INTERFACES lif_json.
+ENDCLASS.
+
+CLASS lcl_identity_json IMPLEMENTATION.
+  METHOD lif_json~parse.
+    TRY.
+
+        ASSIGN to->* TO FIELD-SYMBOL(<to>).
+
+        CALL TRANSFORMATION id
+           SOURCE XML json
+           RESULT data = <to>.
+
+      CATCH cx_static_check.
+        "handle exception
+    ENDTRY.
+  ENDMETHOD.
+
+  METHOD lif_json~render.
+    TRY.
+
+        DATA(lo_json) = cl_sxml_string_writer=>create( if_sxml=>co_xt_json ).
+
+        CALL TRANSFORMATION id
+           SOURCE data = data
+           RESULT XML lo_json.
+
+        json = lo_json->get_output( ).
+
+      CATCH cx_static_check.
+        "handle exception
+    ENDTRY.
+  ENDMETHOD.
+  METHOD lif_json~stringify.
+    DATA(json) = me->lif_json~render( data  ).
+    result = cl_abap_conv_codepage=>create_in( )->convert( source = json  ).
   ENDMETHOD.
 
 ENDCLASS.
