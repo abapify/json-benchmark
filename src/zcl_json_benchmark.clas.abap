@@ -37,6 +37,8 @@ CLASS zcl_json_benchmark DEFINITION FINAL PUBLIC.
            END OF ty_main.
 
     CLASS-DATA sample TYPE ty_main.
+    CLASS-DATA sample_json TYPE string.
+    CLASS-DATA sample_json_binary TYPE xstring.
 
     CLASS-METHODS class_constructor.
 ENDCLASS.
@@ -74,6 +76,11 @@ CLASS zcl_json_benchmark IMPLEMENTATION.
           nested_table = VALUE #( FOR i = 1 THEN i + 1 UNTIL i > 10 ( VALUE #( int_field = i char_field = |Entry { i }| ) ) )
 *          ref_table = VALUE #( FOR i = 1 THEN i + 1 UNTIL i > 5 ( NEW ty_nested( int_field = i char_field = |Ref { i }| )  ) )
           ).
+
+        sample_json        = zcl_json=>stringify( sample ).
+        sample_json_binary = zcl_json=>render( sample ).
+
+
       CATCH cx_uuid_error.
         "handle exception
     ENDTRY.
@@ -92,11 +99,11 @@ CLASS zcl_json_benchmark IMPLEMENTATION.
         out->write( name = 'xco_cp_json' data = NEW lcl_xco_json( )->lif_json~stringify( sample-id ) ).
         out->write( name = 'zcl_json' data = NEW lcl_abapify_json( )->lif_json~stringify( sample-id ) ).
 
-        types:
-            BEGIN OF root_ts,
-              name TYPE REF TO data,
-            END OF root_ts.
-        data(ref_to_sample) = VALUE root_ts( name = ref #( sample-name ) ).
+        TYPES:
+          BEGIN OF root_ts,
+            name TYPE REF TO data,
+          END OF root_ts.
+        DATA(ref_to_sample) = VALUE root_ts( name = REF #( sample-name ) ).
         out->write( ` ` ).
         out->write( 'Ref to data' ).
         out->write( name = '/ui2/cl_json' data = NEW lcl_ui2_json( )->lif_json~stringify( ref_to_sample ) ).
@@ -104,17 +111,42 @@ CLASS zcl_json_benchmark IMPLEMENTATION.
         out->write( name = 'zcl_json' data = NEW lcl_abapify_json( )->lif_json~stringify( ref_to_sample ) ).
         out->write( name = 'identity' data = NEW lcl_identity_json( )->lif_json~stringify( ref_to_sample ) ).
 
-        types:
-            BEGIN OF root_root_ts,
-              root TYPE REF TO root_ts,
-            END OF root_root_ts.
-        data(ref_to_root) = VALUE root_root_ts( root = ref #( ref_to_sample ) ).
+        TYPES:
+          BEGIN OF root_root_ts,
+            root                 TYPE REF TO root_ts,
+            array_of_ref_to_data TYPE TABLE OF REF TO data WITH EMPTY KEY,
+          END OF root_root_ts.
+        DATA(ref_to_root) = VALUE root_root_ts( root = REF #( ref_to_sample ) ).
         out->write( ` ` ).
         out->write( 'Ref to structure' ).
         out->write( name = '/ui2/cl_json' data = NEW lcl_ui2_json( )->lif_json~stringify( ref_to_root ) ).
         " XCO dumps
         out->write( name = 'zcl_json' data = NEW lcl_abapify_json( )->lif_json~stringify( ref_to_root ) ).
-        out->write( name = 'identity' data = NEW lcl_identity_json( )->lif_json~stringify( ref_to_root ) ).
+
+
+        TYPES:
+          BEGIN OF abap_bool_ts,
+            true TYPE abap_bool,
+          END OF abap_bool_ts,
+          BEGIN OF xsdboolean_ts,
+            true TYPE xsdboolean,
+          END OF xsdboolean_ts.
+
+        DATA(root_with_ref_table) = VALUE root_root_ts(
+          array_of_ref_to_data = VALUE #(
+          ( NEW abap_bool_ts(  true = abap_true ) )
+          ( NEW xsdboolean_ts( true = abap_true ) )
+          )
+        ).
+
+        out->write( ` ` ).
+        out->write( 'Table of Ref to data' ).
+        out->write( name = '/ui2/cl_json' data = NEW lcl_ui2_json( )->lif_json~stringify( root_with_ref_table ) ).
+        " XCO dumps
+        out->write( name = 'zcl_json' data = NEW lcl_abapify_json( )->lif_json~stringify( root_with_ref_table ) ).
+
+
+
 
 
 

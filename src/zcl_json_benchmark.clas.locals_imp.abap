@@ -137,8 +137,6 @@ CLASS lcl_identity_json IMPLEMENTATION.
         ASSIGN to->* TO FIELD-SYMBOL(<to>).
 
         CALL TRANSFORMATION id
-           OPTIONS
-           DATA_REFS = 'heap'
            SOURCE XML json
            RESULT data = <to>.
 
