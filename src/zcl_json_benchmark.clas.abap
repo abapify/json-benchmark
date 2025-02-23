@@ -83,6 +83,8 @@ CLASS zcl_json_benchmark IMPLEMENTATION.
 
       CATCH cx_uuid_error.
         "handle exception
+      CATCH cx_static_check.
+        "handle exception
     ENDTRY.
   ENDMETHOD.
   METHOD if_oo_adt_classrun~main.
