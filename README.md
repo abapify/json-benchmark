@@ -102,13 +102,13 @@ Both libs also support `table of ref to data` which is also nice.
 
 ## Performance evaluation
 
-### Rendering (binary format)
+### Rendering and parsing (binary format)
 
 Setup:
 - Same data object
 - 100 iterations
 
-![image](https://github.com/user-attachments/assets/43c986f2-bf94-4cca-8ae5-d9724fca1268)
+![image](https://github.com/user-attachments/assets/859d6211-5c69-45a8-89f7-fc038c8401ef)
 
 As you can see identity is almost free, XCO is disappointingly slow. UI2 seems working 2-3 times faster than Abapify currently.
 
