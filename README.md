@@ -4,19 +4,20 @@
 - /UI2/CL_JSON
 - XCO library
 - [ABAPify JSON](https://github.com/abapify/json) ( ZCL_JSON )
+- [AJSON](https://github.com/sbcgua/ajson) which is used in abapGit
 - Standard identity transformation
 
 ## Feature comparison
 
-| Feature                     | UI2 | XCO | Abapify | Identity
-|-----------------------------|-----|-----|---------|----------
-| Camel case                  | ✅ | ✅ | ✅ | ❌
-| Custom case                 | ❔ | ✅ | ✅ | ❌
-| Custom transformation       | ❌ | ✅ | ❌ | ❌
-| Suppress initial components | ❌ | ❌ | ✅ | ✅ 
-| Support data refs (render)  | ✅ | ❌ | ✅ | ⚠️
-| Support polymorphic tables  | ✅ | ❌ | ✅ | ⚠️ 
-| Root array                  | ✅ | ✅ | ✅ | ❌ 
+| Feature                     | UI2 | XCO | Abapify | Identity | aJSON
+|-----------------------------|-----|-----|---------|----------|------
+| Camel case                  | ✅ | ✅ | ✅ | ❌ | ❔ |
+| Custom case                 | ❔ | ✅ | ✅ | ❌ | ❔ |
+| Custom transformation       | ❌ | ✅ | ❌ | ❌ | ❔ |
+| Suppress initial components | ✅ | ❌ | ✅ | ✅ | ❔ |
+| Support data refs (render)  | ✅ | ❌ | ✅ | ⚠️ | ❔ |
+| Support polymorphic tables  | ✅ | ❌ | ✅ | ⚠️ | ❔ |
+| Root array                  | ✅ | ✅ | ✅ | ❌ | ❔ |
 
 ## Camel case
 Camel case is usually the most common case in JSON world. Removing separators like - or _ helps to reduce the size of payload and devs use a special camelCase notation.
