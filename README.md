@@ -68,7 +68,7 @@ In Abapify JSON you can provide it explicitly if you want
 json = zcl_json=>render( data = data initial_components = 'include' ).
 ```
 
-In UI2 and XCO library i was not able to find such methods. Please contribute if you found.
+In UI2 this can be achieved by using `compress = true` and in XCO library i was not able to find such methods. Please contribute if you found.
 
 
 ## Support data refs
@@ -109,8 +109,7 @@ Setup:
 - Same data object
 - 100 iterations
 
-![image](https://github.com/user-attachments/assets/6adaa00a-47fc-4ee3-a6af-69414838be0f)
-
+![image](https://github.com/user-attachments/assets/2e67bf88-9165-4f9d-a477-5cb01d699ff8)
 
 As you can see identity is almost free, XCO is disappointingly slow. UI2 seems working 2-3 times faster than Abapify currently.
 
