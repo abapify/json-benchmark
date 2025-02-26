@@ -17,7 +17,7 @@ CLASS lcl_json DEFINITION ABSTRACT.
     ALIASES stringify FOR lif_json~stringify.
 ENDCLASS.
 
-CLASS lcl_benchmark DEFINITION INHERITING FROM lcl_json FINAL.
+CLASS lcl_benchmark DEFINITION INHERITING FROM lcl_json.
   PUBLIC SECTION.
     METHODS:
       constructor IMPORTING json_handler TYPE REF TO lif_json.
@@ -71,7 +71,7 @@ CLASS lcl_ui2_json IMPLEMENTATION.
     json = cl_abap_conv_codepage=>create_out( )->convert( string ).
   ENDMETHOD.
   METHOD lif_json~stringify.
-    result = /ui2/cl_json=>serialize( EXPORTING data = data pretty_name = abap_true ).
+    result = /ui2/cl_json=>serialize( EXPORTING data = data pretty_name = abap_true compress = abap_true ).
   ENDMETHOD.
 
 ENDCLASS.
@@ -165,6 +165,44 @@ CLASS lcl_identity_json IMPLEMENTATION.
   METHOD lif_json~stringify.
     DATA(json) = me->lif_json~render( data  ).
     result = cl_abap_conv_codepage=>create_in( )->convert( source = json  ).
+  ENDMETHOD.
+
+ENDCLASS.
+
+CLASS lcl_ajson_json DEFINITION FINAL.
+  PUBLIC SECTION.
+    INTERFACES lif_json.
+ENDCLASS.
+
+CLASS lcl_ajson_json IMPLEMENTATION.
+  METHOD lif_json~parse.
+    TRY.
+
+        ASSIGN to->* to FIELD-SYMBOL(<to>).
+
+        data(lo_json) = zcl_ajson=>parse( json ).
+
+        lo_json->to_abap( exporting iv_corresponding = abap_true importing ev_container = <to> ).
+
+      CATCH cx_static_check.
+        "handle exception
+    ENDTRY.
+  ENDMETHOD.
+
+  METHOD lif_json~render.
+    TRY.
+
+        data(json_string) = me->lif_json~stringify( data = data ).
+        json = zcl_abap_codepage=>to( source = json_string ).
+
+      CATCH cx_static_check.
+        "handle exception
+    ENDTRY.
+  ENDMETHOD.
+  METHOD lif_json~stringify.
+    data(lo_json) = zcl_ajson=>create_empty(  ).
+    lo_json->set( iv_path = '/' iv_val = data ).
+    result = lo_json->stringify(  ).
   ENDMETHOD.
 
 ENDCLASS.

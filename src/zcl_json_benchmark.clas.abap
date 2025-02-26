@@ -73,7 +73,7 @@ CLASS zcl_json_benchmark IMPLEMENTATION.
             xsd_lang_field = sy-langu
             xsd_currcode_field = 'EUR'
             xsd_unitcode_field = 'KM' )
-          nested_table = VALUE #( FOR i = 1 THEN i + 1 UNTIL i > 10 ( VALUE #( int_field = i char_field = |Entry { i }| ) ) )
+          nested_table = VALUE #( FOR i = 1 THEN i + 1 UNTIL i > 100 ( VALUE #( int_field = i char_field = |Entry { i }| ) ) )
 *          ref_table = VALUE #( FOR i = 1 THEN i + 1 UNTIL i > 5 ( NEW ty_nested( int_field = i char_field = |Ref { i }| )  ) )
           ).
 
@@ -146,9 +146,6 @@ CLASS zcl_json_benchmark IMPLEMENTATION.
         out->write( name = '/ui2/cl_json' data = NEW lcl_ui2_json( )->lif_json~stringify( root_with_ref_table ) ).
         " XCO dumps
         out->write( name = 'zcl_json' data = NEW lcl_abapify_json( )->lif_json~stringify( root_with_ref_table ) ).
-
-
-
 
 
 
