@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>ZCL_JSON_DEBUG</CLSNAME>
+    <CLSNAME>ZCL_JSON_RENDER_DEBUG</CLSNAME>
     <LANGU>E</LANGU>
     <DESCRIPT>JSON benchmark</DESCRIPT>
     <STATE>1</STATE>

@@ -1,4 +1,4 @@
-CLASS zcl_json_debug DEFINITION FINAL PUBLIC.
+CLASS zcl_json_render_debug DEFINITION FINAL PUBLIC.
   PUBLIC SECTION.
     INTERFACES if_oo_adt_classrun.
   PRIVATE SECTION.
@@ -14,7 +14,7 @@ CLASS zcl_json_debug DEFINITION FINAL PUBLIC.
                 cx_static_check.
 ENDCLASS.
 
-CLASS zcl_json_debug IMPLEMENTATION.
+CLASS zcl_json_render_debug IMPLEMENTATION.
 
   METHOD if_oo_adt_classrun~main.
 
@@ -64,6 +64,7 @@ CLASS zcl_json_debug IMPLEMENTATION.
 
   METHOD test.
 
+
     " call transformation id
     CALL TRANSFORMATION id
         OPTIONS
@@ -95,15 +96,15 @@ CLASS zcl_json_debug IMPLEMENTATION.
 
     data(case) = zcl_abap_case=>camel(  ).
 
-    call TRANSFORMATION ZJSON_FROM_ABAP_NEXT
-*      PARAMETERS case = case
+    call TRANSFORMATION ZJSON_FROM_ABAP
+      PARAMETERS case = case
       source xml lv_identity_json
       RESULT XML data(lv_result_xml).
      write( name = 'Result JSON XML' data = lv_result_xml ).
 
     DATA(lo_result_json) = cl_sxml_string_writer=>create( if_sxml=>co_xt_json ).
-    call TRANSFORMATION ZJSON_FROM_ABAP_NEXT
-*      PARAMETERS case = case
+    call TRANSFORMATION ZJSON_FROM_ABAP
+      PARAMETERS case = case
       source xml lv_identity_json
       RESULT XML lo_result_json.
     write( name = 'Result JSON' data = lo_result_json->get_output( ) ).
